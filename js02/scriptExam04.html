@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>요금 : <span id="fee"></span></p>
+    <p>대상 : <span id="type"></span></p>
+    <input type="number" id="age" placeholder="나이를 입력하세요" autocomplete="off">
+    <button type="button" onclick="getFee()">계산</button>
+</body>
+<script>
+
+const defaultFee  = 1000;
+
+const getFee  = ()=> {
+  let type = '';
+  let fee = '';
+
+  const age = document.querySelector('#age').value;
+
+  if(age >= 18) {
+      fee = defaultFee * 1.10 ;
+      type = '성인요금';
+  }else if(age >= 13) {
+    fee = defaultFee * 1.05 ;
+    type = '청소년요금';
+  }else {
+    fee = defaultFee;
+    type = '아동요금';
+  }
+
+  const spanFee = document.querySelector('#fee');
+  const spanType = document.querySelector('#type');
+
+  spanFee.textContent = fee;
+  spanType.textContent = type;
+
+
+}
+
+
+
+
+</script>
+</html>

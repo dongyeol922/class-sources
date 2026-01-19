@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+       /*tag 에 공통적으로  부여 가능 */
+       div{
+            background-color: aqua;
+       }
+
+        /*id 선택자를 이용  앞에 # 기호를 붙임 */   
+         #div1{
+            background-color: red;
+         }
+
+        /* name 선택자를 이용  우선순위   
+          전문적으로 설명하자면 name은 선택자는 아니고, 속성을 이용한 지정 방법
+        */
+        div[name="div"] {
+            background-color: blue;
+        }
+
+        /*class 선택자를 이용  앞에 .(dot) 기호를 붙임 */
+        .red{
+            background-color: red;
+        }
+        
+        .blue{
+            background-color: blue;
+        }
+
+        .green{
+            background-color: green;
+        }
+
+        /*선택자 우선순위  id > class > name > tag*/
+    </style>
+</head>
+<body>
+    <div id="div1" name="div" class="red">div1</div> <!-- 붉은색 배경-->
+    <div id="div2" name="div" class="blue">div2</div> <!-- 파란색 배경-->
+    <div id="div3" class="green">div3</div >  <!-- 초록색 배경 -->
+</body>
+</html>

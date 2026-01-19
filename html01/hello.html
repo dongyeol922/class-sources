@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>안녕 클로드</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        .table-container {
+            width: 800px;
+            height: 600px;
+            overflow: auto;
+            border-radius: 10px 10px 0 0;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th:nth-child(1), td:nth-child(1) {
+            width: 25%;
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 20%;
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 20%;
+        }
+
+        th:nth-child(4), td:nth-child(4) {
+            width: 35%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>안녕 클로드1</h1>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>나이</th>
+                    <th>성별</th>
+                    <th>취미</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>홍길동</td>
+                    <td>25</td>
+                    <td>남</td>
+                    <td>독서</td>
+                </tr>
+                <tr>
+                    <td>김영희</td>
+                    <td>30</td>
+                    <td>여</td>
+                    <td>요리</td>
+                </tr>
+                <tr>
+                    <td>이철수</td>
+                    <td>28</td>
+                    <td>남</td>
+                    <td>운동</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

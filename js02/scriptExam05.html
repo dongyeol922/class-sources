@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>결과 : <span id="result"></span></p>
+    <div>
+        <input type="number" id="score">
+        <button type="button" onclick="getResult();">결과</button>
+    </div>
+</body>
+<script>
+    const getResult = () =>{
+
+        const score = document.querySelector('#score').value;
+        const resultSpan = document.querySelector('#result');
+        resultSpan.textContent = '';
+
+        //score 에 값이 존재하고  그 값이 65이상 
+        if(score && score >= 65) {
+            resultSpan.textContent = '합격';
+        }else {
+            resultSpan.textContent = '불합격';
+        }
+    }
+</script>
+</html>

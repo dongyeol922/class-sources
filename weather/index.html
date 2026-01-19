@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>날씨 검색 프로그램</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 2.5rem;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            width: 300px;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-button {
+            padding: 15px 30px;
+            font-size: 1rem;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-button:hover {
+            background: #ee5a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .weather-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            min-width: 350px;
+            display: none;
+        }
+
+        .weather-card.show {
+            display: block;
+        }
+
+        .city-name {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .weather-icon {
+            width: 120px;
+            height: 120px;
+        }
+
+        .temperature {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .weather-description {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+        }
+
+        .weather-details {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌤️ 날씨 검색</h1>
+
+    <div class="search-container">
+        <input
+            type="text"
+            class="search-input"
+            id="cityInput"
+            placeholder="도시 이름을 입력하세요 (예: 서울, Seoul)"
+        >
+        <button class="search-button" id="searchBtn">검색</button>
+    </div>
+
+    <div class="loading" id="loading">검색 중...</div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <div class="weather-card" id="weatherCard">
+        <h2 class="city-name" id="cityName"></h2>
+        <img class="weather-icon" id="weatherIcon" src="" alt="날씨 아이콘">
+        <div class="temperature" id="temperature"></div>
+        <div class="weather-description" id="weatherDescription"></div>
+        <div class="weather-details">
+            <div class="detail-item">
+                <div class="detail-label">습도</div>
+                <div class="detail-value" id="humidity"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">구름</div>
+                <div class="detail-value" id="clouds"></div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">풍속</div>
+                <div class="detail-value" id="wind"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OpenWeatherMap API 키 (https://openweathermap.org/ 에서 무료 발급)
+        const API_KEY = '20a3b7eed569126721230d16cf0ea69c';
+        const API_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+        // 한글 도시명 → 영문 도시명 매핑
+        const cityNameMap = {
+            // 한국 주요 도시
+            '서울': 'Seoul',
+            '부산': 'Busan',
+            '인천': 'Incheon',
+            '대구': 'Daegu',
+            '대전': 'Daejeon',
+            '광주': 'Gwangju',
+            '울산': 'Ulsan',
+            '수원': 'Suwon',
+            '성남': 'Seongnam',
+            '고양': 'Goyang',
+            '용인': 'Yongin',
+            '창원': 'Changwon',
+            '청주': 'Cheongju',
+            '전주': 'Jeonju',
+            '천안': 'Cheonan',
+            '안산': 'Ansan',
+            '안양': 'Anyang',
+            '김해': 'Gimhae',
+            '포항': 'Pohang',
+            '제주': 'Jeju',
+            '평택': 'Pyeongtaek',
+            '시흥': 'Siheung',
+            '화성': 'Hwaseong',
+            '파주': 'Paju',
+            '의정부': 'Uijeongbu',
+            '춘천': 'Chuncheon',
+            '원주': 'Wonju',
+            '강릉': 'Gangneung',
+            '속초': 'Sokcho',
+            '목포': 'Mokpo',
+            '여수': 'Yeosu',
+            '순천': 'Suncheon',
+            '구미': 'Gumi',
+            '경주': 'Gyeongju',
+            '거제': 'Geoje',
+            '양산': 'Yangsan',
+            '진주': 'Jinju',
+            '익산': 'Iksan',
+            '군산': 'Gunsan',
+            // 해외 주요 도시
+            '도쿄': 'Tokyo',
+            '오사카': 'Osaka',
+            '뉴욕': 'New York',
+            '런던': 'London',
+            '파리': 'Paris',
+            '베이징': 'Beijing',
+            '상하이': 'Shanghai',
+            '홍콩': 'Hong Kong',
+            '싱가포르': 'Singapore',
+            '방콕': 'Bangkok',
+            '시드니': 'Sydney',
+            '로스앤젤레스': 'Los Angeles',
+            '샌프란시스코': 'San Francisco'
+        };
+
+        // 한글 도시명을 영문으로 변환하는 함수
+        function convertCityName(input) {
+            return cityNameMap[input] || input;
+        }
+
+        // DOM 요소
+        const cityInput = document.getElementById('cityInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const weatherCard = document.getElementById('weatherCard');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+
+        // 날씨 검색 함수
+        async function searchWeather(city) {
+            // UI 초기화
+            weatherCard.classList.remove('show');
+            errorMessage.classList.remove('show');
+            loading.classList.add('show');
+
+            // 한글 도시명을 영문으로 변환
+            const cityName = convertCityName(city);
+
+            try {
+                const url = `${API_URL}?q=${encodeURIComponent(cityName)}&appid=${API_KEY}&units=metric&lang=kr`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('도시를 찾을 수 없습니다.');
+                    } else if (response.status === 401) {
+                        throw new Error('API 키가 유효하지 않습니다.');
+                    } else {
+                        throw new Error('날씨 정보를 가져오는데 실패했습니다.');
+                    }
+                }
+
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // 날씨 정보 표시 함수
+        function displayWeather(data) {
+            document.getElementById('cityName').textContent = `${data.name}, ${data.sys.country}`;
+            document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
+            document.getElementById('weatherDescription').textContent = data.weather[0].description;
+            document.getElementById('humidity').textContent = `${data.main.humidity}%`;
+            document.getElementById('clouds').textContent = `${data.clouds.all}%`;
+            document.getElementById('wind').textContent = `${data.wind.speed} m/s`;
+
+            // 날씨 아이콘 설정
+            const iconCode = data.weather[0].icon;
+            const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+            document.getElementById('weatherIcon').src = iconUrl;
+
+            weatherCard.classList.add('show');
+        }
+
+        // 에러 메시지 표시 함수
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        // 검색 버튼 클릭 이벤트
+        searchBtn.addEventListener('click', function() {
+            const city = cityInput.value.trim();
+            if (city) {
+                searchWeather(city);
+            } else {
+                showError('도시 이름을 입력해주세요.');
+            }
+        });
+
+        // Enter 키 이벤트
+        cityInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const city = cityInput.value.trim();
+                if (city) {
+                    searchWeather(city);
+                } else {
+                    showError('도시 이름을 입력해주세요.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 번호 제조기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #c00;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #eee;
+            color: #555;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results h2 {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .set {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .set-label {
+            color: #666;
+            font-weight: 600;
+            min-width: 50px;
+        }
+
+        .balls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .ball {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .ball.y { background: #ffc107; }
+        .ball.b { background: #2196f3; }
+        .ball.r { background: #f44336; }
+        .ball.g { background: #9e9e9e; }
+        .ball.gr { background: #4caf50; }
+        .ball.highlight { box-shadow: 0 0 0 3px #ffeb3b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>로또 번호 제조기</h1>
+
+        <div class="input-group">
+            <label>제외할 번호</label>
+            <input type="text" id="exclude" placeholder="예: 1, 7, 13">
+            <div class="hint">쉼표로 구분 (1~45)</div>
+        </div>
+
+        <div class="input-group">
+            <label>포함할 번호</label>
+            <input type="text" id="include" placeholder="예: 3, 12, 25">
+            <div class="hint">쉼표로 구분, 최대 6개</div>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="buttons">
+            <button class="btn-generate" onclick="generate()">번호 생성</button>
+            <button class="btn-reset" onclick="reset()">초기화</button>
+        </div>
+
+        <div class="results" id="results">
+            <h2>이번주 추천번호</h2>
+            <div id="sets"></div>
+        </div>
+    </div>
+
+    <script>
+        // 입력값을 숫자 배열로 변환
+        function parse(str) {
+            if (!str.trim()) return [];
+            return [...new Set(
+                str.split(',')
+                   .map(s => parseInt(s.trim()))
+                   .filter(n => n >= 1 && n <= 45)
+            )];
+        }
+
+        // 번호 색상
+        function getColor(n) {
+            if (n <= 10) return 'y';
+            if (n <= 20) return 'b';
+            if (n <= 30) return 'r';
+            if (n <= 40) return 'g';
+            return 'gr';
+        }
+
+        // 로또 번호 생성
+        function generate() {
+            const error = document.getElementById('error');
+            const exclude = parse(document.getElementById('exclude').value);
+            const include = parse(document.getElementById('include').value);
+
+            // 유효성 검사
+            error.style.display = 'none';
+
+            if (include.length > 6) {
+                error.textContent = '포함번호는 최대 6개까지입니다.';
+                error.style.display = 'block';
+                return;
+            }
+
+            const conflict = include.filter(n => exclude.includes(n));
+            if (conflict.length > 0) {
+                error.textContent = `${conflict.join(', ')}이(가) 제외/포함에 중복됩니다.`;
+                error.style.display = 'block';
+                return;
+            }
+
+            // 사용 가능한 번호
+            const available = [];
+            for (let i = 1; i <= 45; i++) {
+                if (!exclude.includes(i)) available.push(i);
+            }
+
+            if (available.length < 6) {
+                error.textContent = '제외번호가 너무 많습니다.';
+                error.style.display = 'block';
+                return;
+            }
+
+            // 5세트 생성
+            const sets = [];
+            for (let i = 0; i < 5; i++) {
+                const set = [...include];
+                const pool = available.filter(n => !include.includes(n));
+
+                while (set.length < 6) {
+                    const idx = Math.floor(Math.random() * pool.length);
+                    set.push(pool.splice(idx, 1)[0]);
+                }
+
+                sets.push(set.sort((a, b) => a - b));
+            }
+
+            // 결과 표시
+            document.getElementById('sets').innerHTML = sets.map((set, i) => `
+                <div class="set">
+                    <span class="set-label">${i + 1}</span>
+                    <div class="balls">
+                        ${set.map(n => `<div class="ball ${getColor(n)} ${include.includes(n) ? 'highlight' : ''}">${n}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('results').style.display = 'block';
+        }
+
+        // 초기화
+        function reset() {
+            document.getElementById('exclude').value = '';
+            document.getElementById('include').value = '';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

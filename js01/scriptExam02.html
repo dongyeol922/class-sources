@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        이름 : <span id="name"></span>
+    </div>
+</body>
+<script>
+
+  /*매개변수가 있고,  리턴이 없은  함수 */
+  function printName(name){
+        /*자바스크립트에서 tag 가져오기 */
+        //const span = document.getElementById('name');
+        const spanName = document.querySelector('#name');
+        spanName.innerText = name;
+        
+        
+  }
+
+  //함수는 호출을 통해서 실행 
+  printName('홍길동');
+
+  </script>
+</html>

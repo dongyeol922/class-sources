@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        div{
+            width: 100px;
+            height: 100px;
+            border: 1px solid;
+        }
+
+        /*float 속성은 다음 요소에 상속된다. 
+         상속 요소가 위치 지정이 안되어 있으면 기준점(하얀화면, document) 외쪽에 붙어버림*/
+        .div1, .div2{
+            float: left;
+            width: 29%;
+        }
+
+        .div3 {
+            float: right;
+            width: 40%;
+        }
+
+        .div4{
+            /*float 영향(상속)을 받지 않으려면 해제 하면된다.*/
+            clear: both;
+        }
+
+        .div4, .div5{
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="div1">div1</div>
+    <div class="div2">div2</div>
+    <div class="div3">div3</div>
+    <div class="div4">div4</div>
+    <div class="div5">div5</div>
+</body>
+</html>
