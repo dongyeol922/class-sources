@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=+, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button type="button" id="ckBtn">클릭</button>
+</body>
+<script>
+
+    const hello = () =>{
+        alert('안녕');
+    }
+
+   const btn = document.querySelector('#ckBtn');
+   /*button에 onclick 이벤트 부여 */
+  // btn.addEventListener('click', hello);
+  btn.addEventListener('click',  () => alert('안녕') );
+
+</script>
+</html>
