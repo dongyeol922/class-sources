@@ -13,7 +13,7 @@ const weatherIcon = document.getElementById('weatherIcon');
 
 // 날씨 검색 함수
 async function searchWeather() {
-    const city = cityInput.value.trim();
+    const city = cityInput.value.trim(); 
 
     if (!city) {
         showError('도시 이름을 입력해주세요.');
@@ -26,7 +26,8 @@ async function searchWeather() {
     }
 
     try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric&lang=kr`;
+
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric&lang=kr`;
         const response = await fetch(url);
 
         if (!response.ok) {
