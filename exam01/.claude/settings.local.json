@@ -3,5 +3,10 @@
     "context7",
     "github",
     "playwright"
-  ]
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(git push)"
+    ]
+  }
 }
